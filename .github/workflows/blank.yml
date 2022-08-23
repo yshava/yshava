@@ -1,3 +1,8 @@
+# Stage1:
+#parameters:
+#- name: targetModule
+  #default: 'All'
+  
 # This is a basic workflow to help you get started with Actions
 
 name: CI
@@ -15,22 +20,27 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+  # リソース取得
+  UT:        
+    # VmImageはWindowsを使う: UT(C#)の実行はWindowsじゃないとダメだから
+    runs-on: windows-latest
+    #variables:
+      #system.debug: true
+  
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      # GitHubからソースをCheckout
+      #- checkout: origin
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      #- ${{ if or(eq(parameters.targetModule, 'All'), eq(parameters.targetModule, 'Batch'), eq(parameters.targetModule, 'API')) }}:
+        - name: Configure VM
+          run: Set-Timezone -Id "Tokyo Standard Time"
+                npm install -g azurite
+                Start-Process azurite-blob.cmd -PassThru
+          shell: powershell
+          #inputs:
+            #targetType: 'inline'
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+      #- ${{ if or(eq(parameters.targetModule, 'All'), eq(parameters.targetModule, 'API')) }}:
+        - name: Unit Test(C#) - API
+        #- task: DotNetCoreCLI@2
+          continueOnError: true
