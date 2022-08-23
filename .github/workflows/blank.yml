@@ -30,7 +30,7 @@ jobs:
     steps:
       # GitHubからソースをCheckout
       #- checkout: origin
-
+        - uses: actions/checkout@v3
       #- ${{ if or(eq(parameters.targetModule, 'All'), eq(parameters.targetModule, 'Batch'), eq(parameters.targetModule, 'API')) }}:
         - name: Configure VM1
           run: Set-Timezone -Id "Tokyo Standard Time"
@@ -43,3 +43,14 @@ jobs:
           shell: powershell
           #inputs:
             #targetType: 'inline'
+      #- ${{ if or(eq(parameters.targetModule, 'All'), eq(parameters.targetModule, 'API')) }}:        
+        - name: Setup .NET Core SDK
+          uses: actions/setup-dotnet@v2
+          with:
+            dotnet-version: '4.x'
+        - name: Install dependencies
+          run: dotnet restore
+        - name: Build
+          run: dotnet build --configuration Release --no-restore
+        - name: Test
+          run: dotnet test --no-restore --verbosity normal
