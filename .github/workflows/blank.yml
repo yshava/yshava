@@ -32,10 +32,14 @@ jobs:
       #- checkout: origin
 
       #- ${{ if or(eq(parameters.targetModule, 'All'), eq(parameters.targetModule, 'Batch'), eq(parameters.targetModule, 'API')) }}:
-        - name: Configure VM
+        - name: Configure VM1
           run: Set-Timezone -Id "Tokyo Standard Time"
-                npm install -g azurite
-                Start-Process azurite-blob.cmd -PassThru
+          shell: powershell
+        - name: Configure VM2
+          run: npm install -g azurite
+          shell: powershell
+        - name: Configure VM3
+          run: Start-Process azurite-blob.cmd -PassThru
           shell: powershell
           #inputs:
             #targetType: 'inline'
