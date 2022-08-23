@@ -39,8 +39,3 @@ jobs:
           shell: powershell
           #inputs:
             #targetType: 'inline'
-
-      #- ${{ if or(eq(parameters.targetModule, 'All'), eq(parameters.targetModule, 'API')) }}:
-        - name: Unit Test(C#) - API
-        #- task: DotNetCoreCLI@2
-          continueOnError: true
