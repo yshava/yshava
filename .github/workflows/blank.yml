@@ -9,14 +9,30 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+          target:
+            type: choice
+            description: 対象環境を選択
+            options:
+            - dev
+            - sqa
+            default: dev
+            required: true
+          tag:
+            description: 対象Tag名を指定
+            default: ''
+            required: true
+          isDeployDB:
+            description: 'DB'
+            required: true
+            type: boolean
+          isDeployAPI:
+            description: 'API'
+            required: true
+            type: boolean
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -24,14 +40,9 @@ jobs:
   UT:        
     # VmImageはWindowsを使う: UT(C#)の実行はWindowsじゃないとダメだから
     runs-on: windows-latest
-    #variables:
-      #system.debug: true
   
     steps:
-      # GitHubからソースをCheckout
-      #- checkout: origin
         - uses: actions/checkout@v3
-      #- ${{ if or(eq(parameters.targetModule, 'All'), eq(parameters.targetModule, 'Batch'), eq(parameters.targetModule, 'API')) }}:
         - name: Configure VM1
           run: Set-Timezone -Id "Tokyo Standard Time"
           shell: powershell
@@ -41,16 +52,4 @@ jobs:
         - name: Configure VM3
           run: Start-Process azurite-blob.cmd -PassThru
           shell: powershell
-          #inputs:
-            #targetType: 'inline'
-      #- ${{ if or(eq(parameters.targetModule, 'All'), eq(parameters.targetModule, 'API')) }}:        
-        - name: Setup .NET Core SDK
-          uses: actions/setup-dotnet@v2
-          with:
-            dotnet-version: '4.x'
-        - name: Install dependencies
-          run: dotnet restore
-        - name: Build
-          run: dotnet build --configuration Release --no-restore
-        - name: Test
-          run: dotnet test --no-restore --verbosity normal
+
